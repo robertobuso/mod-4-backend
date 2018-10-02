@@ -3,11 +3,15 @@ class Api::V1::UsersController < ApplicationController
 
     def index
       @users = User.all
+      render json: @users
     end
 
     def create
+      @users = User.all
       @user = User.new(user_params)
-      if @user.save
+      if @users.find { |inst| inst.username == @user.username}
+        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      elsif @user.save
         render json: @user, status: :accepted
       else
         render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
@@ -30,7 +34,7 @@ class Api::V1::UsersController < ApplicationController
     private
 
     def user_params
-      params.permit(:username, :name, :mod, :language, :eye_color, :height, :hobby)
+      params.permit(:user, :username, :name, :mod, :language, :eye_color, :height, :hobby, :description, :password)
     end
 
     def find_user
